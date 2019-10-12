@@ -28,16 +28,19 @@ namespace SecDBLoad
         private static void GrabProcessAndStore(string yearAndQuarter)
         {
             string fileName = yearAndQuarter + ".zip";
-            string folder = @"C:\Users\Trevor\Desktop\secdb";
+            string folder = @"C:\Users\tandrade\Desktop\secdb";
             string zipFilePath = Path.Combine(folder, fileName);
             DownloadFileFromSEC(fileName, zipFilePath);
             ZipFile.ExtractToDirectory(zipFilePath, Path.Combine(folder, yearAndQuarter));
             filetypes.ToList<string>().ForEach(filetype =>
             {
-                string fullpath = $@"C:\Users\Trevor\Desktop\secdb\{yearAndQuarter}\{filetype}fixed.txt";
-                ConvertFile($@"C:\Users\Trevor\Desktop\secdb\{yearAndQuarter}\{filetype}.txt", fullpath);
-                GrantAccess(fullpath);
-                CopyToPostgres(filetype, fullpath);
+                string[] paths = { folder, yearAndQuarter, $@"{filetype}.txt" };
+                string inputpath = Path.Combine(paths);
+                paths = new[]{folder, yearAndQuarter, $@"{filetype}fixed.txt" };
+                string outputPath = Path.Combine(paths);
+                ConvertFile(inputpath, outputPath);
+                GrantAccess(outputPath);
+                CopyToPostgres(filetype, outputPath);
             });
         }
 
@@ -52,7 +55,7 @@ namespace SecDBLoad
         {
             try
             {
-                using (NpgsqlConnection conn = new NpgsqlConnection("Server=localhost;User Id=postgres;Database=SECdb;Password=password;CommandTimeout=0;"))
+                using (NpgsqlConnection conn = new NpgsqlConnection("Server=localhost;User Id=postgres;Database=SECdb;Password=p;CommandTimeout=0;"))
                 {
                     conn.Open();
                     NpgsqlCommand command = new NpgsqlCommand($@"COPY {filetype} FROM '{fullpath}' with null as ''", conn);
