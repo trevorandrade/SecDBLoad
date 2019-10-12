@@ -70,7 +70,7 @@ datatype varchar(20) NULL,
 iord varchar(1) NULL,
 crdr varchar(1) NULL,
 tlabel varchar(512) NULL,
-doc varchar(2048) NULL
+doc text NULL
 );
 
 COPY tag FROM 'C:\Users\Trevor\Desktop\tagfixed.txt' with null as '';
